@@ -17,346 +17,348 @@
 - 链路层: MAC
 - 物理层: PHY
 - 接口: RJ-45
-## 协议
-- HTTP
-  - 组成
-    - 请求行: 方法 URI 协议版本, 如果对服务器本身发起请求, URI可用*代替
-    - 响应行: 协议版本 状态码(status code) 状态短语(reason-phrase)
-    - 请求首部
-      - 内容协商
-        - Accept: 客户端可处理的媒体类型
-        - Accept-Charset: 优先的字符集
-        - Accept-Encoding: 优先的内容编码
-          - gzip: gzip压缩
-          - compress: LZW算法压缩
-          - deflate: zlib压缩
-          - identity: 不压缩
-        - Accept-Language: 优先的语系
-      - 认证
-        - Authorization: 用户认证信息
-        - Proxy-Authorization: 代理服务器所要求的用户认证信息
-      - 客户端信息
-        - From: 用户的电子邮箱地址
-        - Referer: 对请求中URI的原始获取方
-        - User-Agent: HTTP客户端程序的信息
-      - 服务器信息
-        - Host: 请求资源所在服务器
-      - 缓存控制
-        - If-Match: 比较实体的标记(ETag)
-        - If-None-Match: 比较实体标记(与If-Match相反)
-        - If-Modified-Since: 比较资源的更新时间
-        - If-Unmodified-Since: 比较资源的更新时间(与If-Modified-Since相反)
-      - 传输方式
-        - If-Range: 资源未更新时发送实体Byte的范围请求
-        - Range: 实体的字节范围请求
-        - TE: 传输编码的优先级
-      - 代理
-        - Max-Forwards: 最大传输逐跳数
-      - 状态
-        - Cookie: 状态
-      - 其他
-        - Expect: 期待服务器的特定行为
-    - 响应首部
-      - 传输方式
-        - Accept-Ranges: 是否接收字节范围请求, 可以时返回bytes, 不可以返回none
-      - 缓存
-        - Age: 推算资源创建经过的时间
-        - ETag: 资源的标签, 分强缓存和弱缓存, 强缓存无论实体发生多么细微的变化都会改变其值, 若缓存只用于提示资源是否相同, 只有资源发生了根本改变, 产生差异才会改变其值, 并在字段值最开始处附加W/
-        - Vary: 代理服务器缓存的管理信息
-      - 认证
-        - WWW-Authenticate: 服务器对客户端的认证信息
-        - Proxy-Authenticate: 代理服务器对客户端的认证信息
-      - 服务器信息
-        - Server: HTTP服务器的安装信息
-      - 状态
-        - Set-Cookie: 状态设置
-          - NAME=VALUE: Cookie的键值对
-          - expires=DATE: Cookie有效期
-          - path=PATH: Cookie路径
-          - domain=DOMAIN: Cookie域名
-          - Secure: 仅在HTTPS安全通信时发送Cookie
-          - HttpOnly: 加以限制, 使Cookie不能被JavaScript脚本访问
-      - 其他
-        - Location: 3xx时, 客户端重定向所指定的URI
-        - Retry-After: 5xx时, 再次发起请求的时机
-    - 通用首部
-      - 缓存控制
-        - Cache-Control: 控制缓存行为
-          - 通用缓存指令
-            - no-cache: 请求中表示不要缓存资源直接从源服务器取, 响应中表示可以缓存但每次请求必须向源服务器确认资源有效应
-            - no-store
-            - no-transform
-            - max-age=<second>
-            - cache-extension
-          - 缓存请求指令
-            - max-stale[=<second>]
-            - min-fresh=<second>
-            - only-if-cached
-          - 缓存响应指令
-            - public
-            - private
-            - must-revalidate
-            - proxy-revalidate
-            - s-maxage=<second>
-      - 传输方式
-        - Connection: 逐跳首部, 连接管理
-          - Upgrade: 升级为其他协议, 由Upgrade字段决定
-          - close: 短连接
-          - Keep-Alive: 长连接
-        - Upgrade: 升级为其他协议
-        - Transfer-Encoding: 报文主体的传输编码方式, 只对chunked有效, 表示分块传输
-      - 代理
-        - Via: 代理服务器相关信息
-      - 其他
-        - Date: 创建报文的时间
-        - Pragma: 报文指令, 为兼容之前的协议版本而指定的
-        - Trailer: 报文末端的首部一览
-        - Warning: 错误通知
-    - 实体首部
-      - Allow: 资源可支持的HTTP方法
-      - Content-Encoding: 实体主体的编码方式
-      - Content-Language: 实体主体的语系
-      - Content-Length: 实体主体的大小
-      - Content-Location: 替代对应资源的URI
-      - Content-MD5: 实体主体的报文摘要
-      - Content-Range: 实体主体的位置范围
-      - Content-Type: 实体主体的媒体类型
-      - Content-Disposition
-      - Expires: 实体主体的过期时间
-      - Last-Modified: 资源的最后修改日期
-    - 空行(CR+LF)
-    - 内容实体
-  - 协议版本
-    - HTTP/1.0, HTTP/1.1, HTTP/1.1, HTTP/2.0
-    - WebSocket: HTTP连接建立后, 需要完成一次握手, 请求字段Connection: Upgrade, Upgrade: websocket
-  - 传输方式
-    - 普通传输: Content-Length进行分界
-    - 多数据对象传输: Content-Type=multipart/form-data(客户端传数据)或multipart/byteranges(服务端传数据), boundary分界符进行分界
-    - 分块传输: 服务端传数据, Content-Encoding=Transfer Coding, 最后一块实体加上CR+LF进行分界
-    - 范围请求(Range Request): 服务端传数据, Range=<start_byte>-<end_byte>, Content-Range=<start_byte>-<end_byte>, 数据范围进行分界
-  - 特点
-    - 请求从客户端首先发出, 服务端其次回复响应, 1.1实现了持久连接(keep-alive), 并且实现了管线化(pipelining)
-    - 无状态协议
-    - Cookie: 引入进来实现有状态
-  - 功能
-    - 客户端信息
-    - 服务器信息
-    - 认证
-      - 认证方式
-        - BASIC认证: 对称加密
-        - DIGEST认证: 散列加密
-        - SSL客户端认证: 非对称加密
-        - FormBase认证: 对称加密
-      - 认证状态记录
-        - SessionID
-        - OAuth
-    - 缓存控制
-      - 设定资源的缓存信息: ETag, Last-Modified, max-age/Expires
-      - 判断缓存有效性: If-None-Match, If-None-Modified, max-age/Expires
+## HTTP
+- 组成
+  - 请求行: 方法 URI 协议版本, 如果对服务器本身发起请求, URI可用*代替
+  - 响应行: 协议版本 状态码(status code) 状态短语(reason-phrase)
+  - 请求首部
     - 内容协商
+      - Accept: 客户端可处理的媒体类型
+      - Accept-Charset: 优先的字符集
+      - Accept-Encoding: 优先的内容编码
+        - gzip: gzip压缩
+        - compress: LZW算法压缩
+        - deflate: zlib压缩
+        - identity: 不压缩
+      - Accept-Language: 优先的语系
+    - 认证
+      - Authorization: 用户认证信息
+      - Proxy-Authorization: 代理服务器所要求的用户认证信息
+    - 客户端信息
+      - From: 用户的电子邮箱地址
+      - Referer: 对请求中URI的原始获取方
+      - User-Agent: HTTP客户端程序的信息
+    - 服务器信息
+      - Host: 请求资源所在服务器
+    - 缓存控制
+      - If-Match: 比较实体的标记(ETag)
+      - If-None-Match: 比较实体标记(与If-Match相反)
+      - If-Modified-Since: 比较资源的更新时间
+      - If-Unmodified-Since: 比较资源的更新时间(与If-Modified-Since相反)
     - 传输方式
-    - 状态
+      - If-Range: 资源未更新时发送实体Byte的范围请求
+      - Range: 实体的字节范围请求
+      - TE: 传输编码的优先级
     - 代理
-  - 攻击方式
-    - Dos
-    - MITM
-    - SQL注入
-    - XSS
-  - 端到端首部
-  - 逐跳首部: 只在单次转发有效, 需提供Connection首部字段
-    - Connection
-    - Keep-Alive
-    - Proxy-Authenticate
-    - Proxy-Authorization
-    - Trailer
-    - TE
-    - Transfer-Encoding
-    - Upgrade
-  - URI, URL: 协议://用户名:口令@域名或IP地址:端口号/路径名?查询字符串#片段标识符
-  - 请求方法
-    - GET: 获取资源
-    - POST: 传输实体主体
-    - PUT: 传输文件
-    - DELETE: 删除文件
-    - HEAD: 获得指定URI响应报文首部, 确认URI的有效应及资源更新的日期
-    - OPTIONS: 询问指定URI支持的方法
-    - TRACE: 追踪路径
-    - CONNECT: 用隧道协议连接代理, 用SSL和TLS协议加密通信内容
-  - 状态码, 状态短语
-    - 1xx: 正在处理
-      - 101 Switching Protocols: 协议转换
-    - 2xx: 成功
-      - 200 OK: 请求成功
-      - 204 No Content: 请求不含实体
-      - 206 Partial Content: 范围请求时返回的响应报文
-    - 3xx: 重定向
-      - 301 Moved Permanently: 资源URI永久变更, 客户端会根据Location字段更新书签
-      - 302 Found: 资源URI临时变更
-      - 303 See Other: 资源URI临时变更, 用GET方法去获取
-      - 304 Not Modified: 资源已找到, 但未符合条件请求
-      - 307 Temporary Redirect: 临时重定向
-    - 4xx: 客户端出错
-      - 400 Bad Request: 请求报文语法错误
-      - 401 Unauthorized: 需要HTTP认证信息(BASIC认证, DIGEST认证)
-      - 403 Forbidden: 禁止访问此资源
-      - 404 Not Found: 服务器上没有请求的资源
-    - 5xx: 服务器出错
-      - 500 Internal Server Error: 内部资源出了故障
-      - 503 Service Unavailable: 服务器处于无法处理请求的状态
-- TCP
-  - 发送端口号: 16bit
-  - 接收端口号: 16bit
-  - 序号: 32bit
-  - ACK号: 32bit
-  - 数据偏移量: 4bit
-  - 保留: 6
-  - 控制位: 6bit
-    - URG
-    - ACK
-    - PSH
-    - RST
-    - SYN
-    - FIN
-  - 窗口: 16bit
-  - 校验和: 16bit
-  - 紧急指针: 16bit
+      - Max-Forwards: 最大传输逐跳数
+    - 状态
+      - Cookie: 状态
+    - 其他
+      - Expect: 期待服务器的特定行为
+  - 响应首部
+    - 传输方式
+      - Accept-Ranges: 是否接收字节范围请求, 可以时返回bytes, 不可以返回none
+    - 缓存
+      - Age: 推算资源创建经过的时间
+      - ETag: 资源的标签, 分强缓存和弱缓存, 强缓存无论实体发生多么细微的变化都会改变其值, 若缓存只用于提示资源是否相同, 只有资源发生了根本改变, 产生差异才会改变其值, 并在字段值最开始处附加W/
+      - Vary: 代理服务器缓存的管理信息
+    - 认证
+      - WWW-Authenticate: 服务器对客户端的认证信息
+      - Proxy-Authenticate: 代理服务器对客户端的认证信息
+    - 服务器信息
+      - Server: HTTP服务器的安装信息
+    - 状态
+      - Set-Cookie: 状态设置
+        - NAME=VALUE: Cookie的键值对
+        - expires=DATE: Cookie有效期
+        - path=PATH: Cookie路径
+        - domain=DOMAIN: Cookie域名
+        - Secure: 仅在HTTPS安全通信时发送Cookie
+        - HttpOnly: 加以限制, 使Cookie不能被JavaScript脚本访问
+    - 其他
+      - Location: 3xx时, 客户端重定向所指定的URI
+      - Retry-After: 5xx时, 再次发起请求的时机
+  - 通用首部
+    - 缓存控制
+      - Cache-Control: 控制缓存行为
+        - 通用缓存指令
+          - no-cache: 请求中表示不要缓存资源直接从源服务器取, 响应中表示可以缓存但每次请求必须向源服务器确认资源有效应
+          - no-store
+          - no-transform
+          - max-age=<second>
+          - cache-extension
+        - 缓存请求指令
+          - max-stale[=<second>]
+          - min-fresh=<second>
+          - only-if-cached
+        - 缓存响应指令
+          - public
+          - private
+          - must-revalidate
+          - proxy-revalidate
+          - s-maxage=<second>
+    - 传输方式
+      - Connection: 逐跳首部, 连接管理
+        - Upgrade: 升级为其他协议, 由Upgrade字段决定
+        - close: 短连接
+        - Keep-Alive: 长连接
+      - Upgrade: 升级为其他协议
+      - Transfer-Encoding: 报文主体的传输编码方式, 只对chunked有效, 表示分块传输
+    - 代理
+      - Via: 代理服务器相关信息
+    - 其他
+      - Date: 创建报文的时间
+      - Pragma: 报文指令, 为兼容之前的协议版本而指定的
+      - Trailer: 报文末端的首部一览
+      - Warning: 错误通知
+  - 实体首部
+    - Allow: 资源可支持的HTTP方法
+    - Content-Encoding: 实体主体的编码方式
+    - Content-Language: 实体主体的语系
+    - Content-Length: 实体主体的大小
+    - Content-Location: 替代对应资源的URI
+    - Content-MD5: 实体主体的报文摘要
+    - Content-Range: 实体主体的位置范围
+    - Content-Type: 实体主体的媒体类型
+    - Content-Disposition
+    - Expires: 实体主体的过期时间
+    - Last-Modified: 资源的最后修改日期
+  - 空行(CR+LF)
+  - 内容实体
+- 协议版本
+  - HTTP/1.0, HTTP/1.1, HTTP/1.1, HTTP/2.0
+  - WebSocket: HTTP连接建立后, 需要完成一次握手, 请求字段Connection: Upgrade, Upgrade: websocket
+- 传输方式
+  - 普通传输: Content-Length进行分界
+  - 多数据对象传输: Content-Type=multipart/form-data(客户端传数据)或multipart/byteranges(服务端传数据), boundary分界符进行分界
+  - 分块传输: 服务端传数据, Content-Encoding=Transfer Coding, 最后一块实体加上CR+LF进行分界
+  - 范围请求(Range Request): 服务端传数据, Range=<start_byte>-<end_byte>, Content-Range=<start_byte>-<end_byte>, 数据范围进行分界
+- 特点
+  - 请求从客户端首先发出, 服务端其次回复响应, 1.1实现了持久连接(keep-alive), 并且实现了管线化(pipelining)
+  - 无状态协议
+  - Cookie: 引入进来实现有状态
+- 功能
+  - 客户端信息
+  - 服务器信息
+  - 认证
+    - 认证方式
+      - BASIC认证: 对称加密
+      - DIGEST认证: 散列加密
+      - SSL客户端认证: 非对称加密
+      - FormBase认证: 对称加密
+    - 认证状态记录
+      - SessionID
+      - OAuth
+  - 缓存控制
+    - 设定资源的缓存信息: ETag, Last-Modified, max-age/Expires
+    - 判断缓存有效性: If-None-Match, If-None-Modified, max-age/Expires
+  - 内容协商
+  - 传输方式
+  - 状态
+  - 代理
+- 攻击方式
+  - Dos
+  - MITM
+  - SQL注入
+  - XSS
+- 端到端首部
+- 逐跳首部: 只在单次转发有效, 需提供Connection首部字段
+  - Connection
+  - Keep-Alive
+  - Proxy-Authenticate
+  - Proxy-Authorization
+  - Trailer
+  - TE
+  - Transfer-Encoding
+  - Upgrade
+- URI, URL: 协议://用户名:口令@域名或IP地址:端口号/路径名?查询字符串#片段标识符
+- 请求方法
+  - GET: 获取资源
+  - POST: 传输实体主体
+  - PUT: 传输文件
+  - DELETE: 删除文件
+  - HEAD: 获得指定URI响应报文首部, 确认URI的有效应及资源更新的日期
+  - OPTIONS: 询问指定URI支持的方法
+  - TRACE: 追踪路径
+  - CONNECT: 用隧道协议连接代理, 用SSL和TLS协议加密通信内容
+- 状态码, 状态短语
+  - 1xx: 正在处理
+    - 101 Switching Protocols: 协议转换
+  - 2xx: 成功
+    - 200 OK: 请求成功
+    - 204 No Content: 请求不含实体
+    - 206 Partial Content: 范围请求时返回的响应报文
+  - 3xx: 重定向
+    - 301 Moved Permanently: 资源URI永久变更, 客户端会根据Location字段更新书签
+    - 302 Found: 资源URI临时变更
+    - 303 See Other: 资源URI临时变更, 用GET方法去获取
+    - 304 Not Modified: 资源已找到, 但未符合条件请求
+    - 307 Temporary Redirect: 临时重定向
+  - 4xx: 客户端出错
+    - 400 Bad Request: 请求报文语法错误
+    - 401 Unauthorized: 需要HTTP认证信息(BASIC认证, DIGEST认证)
+    - 403 Forbidden: 禁止访问此资源
+    - 404 Not Found: 服务器上没有请求的资源
+  - 5xx: 服务器出错
+    - 500 Internal Server Error: 内部资源出了故障
+    - 503 Service Unavailable: 服务器处于无法处理请求的状态
+## TCP
+- 发送端口号: 16bit
+- 接收端口号: 16bit
+- 序号: 32bit
+- ACK号: 32bit
+- 数据偏移量: 4bit
+- 保留: 6
+- 控制位: 6bit
+  - URG
+  - ACK
+  - PSH
+  - RST
+  - SYN
+  - FIN
+- 窗口: 16bit
+- 校验和: 16bit
+- 紧急指针: 16bit
+- 可选字段: 可变
+## UDP
+- 发送端口号: 16bit
+- 接收端口号: 16bit
+- 数据长度: 16bit
+- 校验和: 16bit
+## IP
+- 组成
+  - 版本号: 4bit
+  - 头部长度: 4bit
+  - 服务类型
+  - 总长度: 16bit
+  - ID号: 16bit
+  - 标志: 3bit
+  - 分片偏移量: 13bit
+  - 生存时间: 8bit
+  - 协议号: 8bit
+  - 头部校验和: 16bit
+  - 发送IP地址: 32bit
+  - 接收IP地址：32bit
   - 可选字段: 可变
-- UDP
-  - 发送端口号: 16bit
-  - 接收端口号: 16bit
-  - 数据长度: 16bit
-  - 校验和: 16bit
-- IP
+- IP地址
   - 组成
-    - 版本号: 4bit
-    - 头部长度: 4bit
-    - 服务类型
-    - 总长度: 16bit
-    - ID号: 16bit
-    - 标志: 3bit
-    - 分片偏移量: 13bit
-    - 生存时间: 8bit
-    - 协议号: 8bit
-    - 头部校验和: 16bit
-    - 发送IP地址: 32bit
-    - 接收IP地址：32bit
-    - 可选字段: 可变
-  - IP地址
-    - 组成
-      - 子网号
-      - 主机号: 全1表示广播地址, 全0表示整个网络
-      - 子网掩码: 不全1表示子网, 全1表示一台机器
-    - 私有地址
-      - 10.0.0.0 ~ 10.255.255.255
-      - 172.16.0.0 ~ 172.31.255.255
-      - 192.168.0.0 ~ 192.168.255.255
-  - 路由表
-    - 组成
-      - 目标地址: 全0表示最低优先级匹配, 最长
-      - 子网掩码: 最长掩码匹配规则, 路由聚合
-      - 网关: IP地址表示下一跳服务器, 空表示找到目标地址
-      - 接口: 传输端口
-      - 跃点数: 越小匹配优先级越高
-    - 规则
-      - 传输报文时IP中TTL字段减1
-      - 若包的长度大于下一跳MTU, 则进行IP分片, 指定了不能分片或已经分过片则不可再分, 直接发送ICMP报文
-      - 匹配不上则向源发送ICMP报文
-    - 维护
-      - 人工
-      - 路由协议
-        - RIP
-        - OSPF
-        - BGP
-- MAC
-  - 接收MAC地址: 48bit
-  - 发送MAC地址: 48bit
-  - 以太类型: 16bit
-    - 0000-05DC: IEEE802.3
-    - 0800: IP协议
-    - 0806: ARP协议
-    - 8600: IPV6
+    - 子网号
+    - 主机号: 全1表示广播地址, 全0表示整个网络
+    - 子网掩码: 不全1表示子网, 全1表示一台机器
+  - 私有地址
+    - 10.0.0.0 ~ 10.255.255.255
+    - 172.16.0.0 ~ 172.31.255.255
+    - 192.168.0.0 ~ 192.168.255.255
+- 路由表
+  - 组成
+    - 目标地址: 全0表示最低优先级匹配, 最长
+    - 子网掩码: 最长掩码匹配规则, 路由聚合
+    - 网关: IP地址表示下一跳服务器, 空表示找到目标地址
+    - 接口: 传输端口
+    - 跃点数: 越小匹配优先级越高
+  - 规则
+    - 传输报文时IP中TTL字段减1
+    - 若包的长度大于下一跳MTU, 则进行IP分片, 指定了不能分片或已经分过片则不可再分, 直接发送ICMP报文
+    - 匹配不上则向源发送ICMP报文
+  - 维护
+    - 人工
+    - 路由协议
+      - RIP
+      - OSPF
+      - BGP
+## MAC
+- 接收MAC地址: 48bit
+- 发送MAC地址: 48bit
+- 以太类型: 16bit
+  - 0000-05DC: IEEE802.3
+  - 0800: IP协议
+  - 0806: ARP协议
+  - 8600: IPV6
 # 通信
-- 分界
-  - HTTP
-    - 普通传输: Content-Length
-    - 分块传输: 最后一块实体后加上CR+LF
-    - 多对象传输: boundary分界符进行分界
-  - 范围请求: 数据范围进行分界
-  - TCP: IP协议的片偏移来判断
-  - IP和MAC: 报文/起始帧分界符(SFD)来判断
-- 差错 
-  - 奇偶校验码
-  - 海明码
-  - CRC冗余校验码
-- 速度
-  - I/O模型
-    - 阻塞I/O
-    - 非阻塞I/O
-    - 多路复用I/O
-    - 信号驱动I/O
-    - 异步I/O
-  - 负载均衡
-  - 缓存
-- 数据量: 流式传输
-- 可靠
-  - 三次握手(连接)
-  - 传输控制
-    - 重传机制
-    - 窗口滑动机制
-  - 四次挥手(关闭连接)
-- 安全性
-  - 手段: 对称加密, 非对称加密, 散列加密
-  - 目的: 机密性, 完整性, 端点鉴别
+## 分界
+- HTTP
+  - 普通传输: Content-Length
+  - 分块传输: 最后一块实体后加上CR+LF
+  - 多对象传输: boundary分界符进行分界
+- 范围请求: 数据范围进行分界
+- TCP: IP协议的片偏移来判断
+- IP和MAC: 报文/起始帧分界符(SFD)来判断
+## 差错 
+- 奇偶校验码
+- 海明码
+- CRC冗余校验码
+## 速度
+- I/O模型
+  - 阻塞I/O
+  - 非阻塞I/O
+  - 多路复用I/O
+  - 信号驱动I/O
+  - 异步I/O
+- 负载均衡
+- 缓存
+## 数据量
+- 流式传输
+## 可靠性
+- 三次握手(连接)
+- 传输控制
+  - 重传机制
+  - 窗口滑动机制
+- 四次挥手(关闭连接)
+## 安全性
+- 手段: 对称加密, 非对称加密, 散列加密
+- 目的: 机密性, 完整性, 端点鉴别
 # 构成
-- 应用
-- socket库
-- DNS解析器
-- 协议栈
-- 防火墙: 进行一个包的过滤
-- 网卡驱动
-- 网卡(NIC)
-  - ROM: MAC号, MTU大小
-  - 缓冲区
-  - MAC
-  - PHY
-- 接口: RJ-45
-- 报文
-  - 报头/起始帧分界符(SFD)
-  - MAC头
-  - IP头
-  - TCP头
-  - 数据
-  - FCS帧校验序列
-- 网络
-  - 组成
-    - 局域网
-    - 接入网
-    - 广域网
-      - POP
-      - NOC
-      - IX
-      - ISP
-  - 协议
-    - 以太网: IEEE802.3, IEEE802.11
-    - ADSL, FTTH: PPPoE
-    - 电话线, ISDN: PPP
-    - CATV
-    - 专线
-    - 无线局域网
-  - 地址转换NAT
-  - 正向代理
-    - 实现方式
-      - IP实现: 二层隧道, 三层隧道
-      - HTTP实现: HTTP proxy, HTTP隧道(CONNECT报文, 解决https无法代理的问题)
-    - 用途
-      - 隐蔽客户端IP
-      - 缓存服务器
-      - 权限控制
-  - 反向代理
-    - IP实现: 通过DNS服务器, 单域名指向多IP
-    - HTTP实现: 反向代理HTTP服务器
-    - 用途
-      - 隐蔽服务器IP
-      - 缓存服务器
-      - 负载均衡
+## 应用
+## socket库
+## DNS解析器
+## 协议栈
+## 防火墙
+- 进行一个包的过滤
+## 网卡驱动
+## 网卡(NIC)
+- ROM: MAC号, MTU大小
+- 缓冲区
+- MAC
+- PHY
+## 接口
+- RJ-45
+## 报文
+- 报头/起始帧分界符(SFD)
+- MAC头
+- IP头
+- TCP头
+- 数据
+- FCS帧校验序列
+## 网络
+- 组成
+  - 局域网
+  - 接入网
+  - 广域网
+    - POP
+    - NOC
+    - IX
+    - ISP
+- 协议
+  - 以太网: IEEE802.3, IEEE802.11
+  - ADSL, FTTH: PPPoE
+  - 电话线, ISDN: PPP
+  - CATV
+  - 专线
+  - 无线局域网
+- 地址转换NAT
+- 正向代理
+  - 实现方式
+    - IP实现: 二层隧道, 三层隧道
+    - HTTP实现: HTTP proxy, HTTP隧道(CONNECT报文, 解决https无法代理的问题)
+  - 用途
+    - 隐蔽客户端IP
+    - 缓存服务器
+    - 权限控制
+- 反向代理
+  - IP实现: 通过DNS服务器, 单域名指向多IP
+  - HTTP实现: 反向代理HTTP服务器
+  - 用途
+    - 隐蔽服务器IP
+    - 缓存服务器
+    - 负载均衡
 
