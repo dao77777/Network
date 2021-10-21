@@ -152,14 +152,39 @@
     - Last-Modified: 资源的最后修改日期
   - 空行(CR+LF)
   - 内容实体
+- 同源策略
+  - 安全性与可用性的平衡点
+    - 可用性: HTML的创作者决定跨域请求是否对本站点安全
+      - <script><img><iframe><link><video><audio>带有src属性可以跨域访问
+      - 允许跨域写操作: 例如表单提交或者重定向请求
+        - CSRF安全性问题
+    - 安全性: 浏览器需要放置沾点A的脚本向沾点B发起危险动作
+      - Cookie, LocalStorage和IndexDB无法读取
+      - DOM无法获得(防止跨域脚本篡改DOM结构)
+    - AJAX请求不能发送
+  - CORS跨域
+    - 简单请求
+      - GET / HEAD / POST方法之一
+      - 仅能使用CORS安全的头部: Accept、Accept-Language、Content-Language、Content-Type
+      - Content-Type值只能是: text/plain、multipart/form-data、application/x-www-urlencoded三者其中之一
+    - 简单请求的跨域
+      - 请求中携带Origin头部告知来自哪个域
+      - 响应中携带Access-Control-Allow-Origin头部表示允许哪些域
+      - 浏览器放行(同源策略是浏览器行为, 能否跨域由浏览器决定)
+    - 复杂请求的跨域
+      - 预检请求头部
+        - Access-Control-Request-Method
+        - Access-Control-Request-Headers
+      - 预检请求响应
+        - Access-Control-Allow-Methods: 允许使用的方法 
+        - Access-Control-Allow-Headers: 允许携带的头部
+        - Access-Control-Max-Age: 该响应的信息允许缓存多久
+        - Access-Control-Expose-Headers: 告知浏览器哪些响应头部可供客户端使用
+        - Access-Control-Allow-Origin: 告知浏览器允许哪些域访问当前资源, *表示所有域
+        - Access-Control-Allow-Credentials: 告知浏览器是否可以将Credentials暴露给客户端使用
 - 协议版本
   - HTTP/1.0, HTTP/1.1, HTTP/1.1, HTTP/2.0
   - WebSocket: HTTP连接建立后, 需要完成一次握手, 请求字段Connection: Upgrade, Upgrade: websocket
-- 传输方式
-  - 普通传输: Content-Length进行分界
-  - 多数据对象传输: Content-Type=multipart/form-data(客户端传数据)或multipart/byteranges(服务端传数据), boundary分界符进行分界
-  - 分块传输: 服务端传数据, Content-Encoding=Transfer Coding, 最后一块实体加上CR+LF进行分界
-  - 范围请求(Range Request): 服务端传数据, Range=<start_byte>-<end_byte>, Content-Range=<start_byte>-<end_byte>, 数据范围进行分界
 - 特点
   - 请求从客户端首先发出, 服务端其次回复响应, 1.1实现了持久连接(keep-alive), 并且实现了管线化(pipelining)
   - 无状态协议
@@ -174,20 +199,29 @@
       - SSL客户端认证: 非对称加密
       - FormBase认证: 对称加密
     - 认证状态记录
-      - SessionID
-      - OAuth
+      - SessionID: 认证状态记录在客户端以及服务器
+      - OAuth: 认证状态记录在客户端
   - 缓存控制
     - 设定资源的缓存信息: ETag, Last-Modified, max-age/Expires
     - 判断缓存有效性: If-None-Match, If-None-Modified, max-age/Expires
   - 内容协商
   - 传输方式
+    - 定长传输: Content-Length进行分界
+    - 不定长传输
+      - 分块传输: 服务端传数据, Content-Encoding=Transfer Coding, 最后一块实体加上CR+LF进行分界
+      - 附件传输: Content-Disposition=attachment, 数据以附件的形式进行传输
+    - 多数据对象传输: Content-Type=multipart/form-data(客户端传数据)或multipart/byteranges(服务端传数据), boundary分界符进行分界
+    - URL传输: Content-Type=application/x-form-urlencoded(客户端通过URL传输数据)
+    - 范围请求(Range Request): 服务端传数据, Range=<start_byte>-<end_byte>, Content-Range=<start_byte>-<end_byte>, 数据范围进行分界
   - 状态
   - 代理
 - 攻击方式
   - Dos
   - MITM
+  - OS注入
   - SQL注入
-  - XSS
+  - XSS(跨站点脚本攻击)
+  - CSRF(跨站点请求伪造)
 - 端到端首部
 - 逐跳首部: 只在单次转发有效, 需提供Connection首部字段
   - Connection
