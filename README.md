@@ -66,10 +66,26 @@
     - 服务器信息
       - Host: 请求资源所在服务器
     - 缓存控制
-      - If-Match: 比较实体的标记(ETag)
-      - If-None-Match: 比较实体标记(与If-Match相反)
-      - If-Modified-Since: 比较资源的更新时间
-      - If-Unmodified-Since: 比较资源的更新时间(与If-Modified-Since相反)
+      - 不缓存
+        - `Cache-Control`
+          - `no-store`: 开启不缓存
+      - 缓存
+        - `Cache-Control`
+          - `public`, `private`: `public`表示在客户端和代理服务器中都可缓存, `private`表示只在客户端进行缓存
+      - 强缓存
+        - `Expires`: 强缓存
+        - `Cache-Control`
+          - `max-age=[生存秒数]`, `s-maxage=<生存秒数>`: 强缓存, 资源的缓存时间, 这期间直接用客户端的缓存资源, `s-maxage`仅在代理服务器中也会缓存资源
+      - 协商缓存
+        - 强缓存时间过期会自动开启协商缓存
+        - `Cache-Control`
+          - `no-cache`: 开启协商缓存
+        - `Last-Modified`: 资源最近更新时间
+        - `If-Modified-Since`: 比较资源最近更新时间
+        - `If-Unmodified-Since`: 比较资源的更新时间(与If-Modified-Since相反)
+        - `etag`: 资源的hash值
+        - `If-None-Match`: 比较实体标记(与If-Match相反)
+        - `If-Match`: 比较实体的标记(ETag)
     - 传输方式
       - If-Range: 资源未更新时发送实体Byte的范围请求
       - Range: 实体的字节范围请求
