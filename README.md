@@ -28,6 +28,7 @@
   - [接口](#接口)
   - [报文](#报文)
   - [网络](#网络)
+- [Todo](#todo)
 
 # 书
 - 《网络是怎样连接的》
@@ -436,4 +437,82 @@
     - 隐蔽服务器IP
     - 缓存服务器
     - 负载均衡
-
+# Todo
+- 资源请求权限
+  - index的url为file协议才能加载file协议的资源
+  - CORS
+    - 触发
+      - xhr请求, script[type="module"], script[crossorigin], link[rel="modulepreload"]响应同源策略
+    - 判断
+      - 协议不同
+      - 域名不同
+      - 端口不通
+      - file协议
+    - 预检请求
+      - 简单请求只返回Access-Control-Allow-Origin
+      - 非简单请求还需返回Access-Control-Allow-Headers, Access-Control-Allow-Methods
+- script[type="module"], link[rel="modulepreload"]会开启同源策略
+- file协议不支持同源策略
+- http
+  - 元信息
+    - Date
+    - Host
+    - Origin
+    - Referer
+    - User-Agent
+    - Server
+    - Allow
+    - Trailer
+    - Location
+    - Retry-After
+  - 同源策略
+    - 
+    - Access-Control-Request-Headers
+    - Access-Control-Request-Method
+    - Access-Control-Allow-Credentials
+    - Access-Control-Allow-Headers
+    - Access-Control-Allow-Methods
+    - Access-Control-Allow-Origin
+    - Access-Control-Expose-Headers
+    - Access-Control-Max-Age
+  - 连接方式
+    - Connection
+    - Keep-Alive
+  - 传输方式
+    - Content-Length
+    - Transfer-Encoding
+    - Content-Range
+    - Range
+  - 状态管理
+    - Cookie
+    - Set-Cookie
+  - 权限管理
+    - Via
+    - Authorization
+    - Proxy-Authorization
+    - WWW-Authenticate
+    - Proxy-Authenticate
+  - 内容协商
+    - Accept
+    - Accept-Charset
+    - Accept-Encoding
+    - Accept-Language
+    - Content-Type
+    - Content-Language
+    - Content-Disposition
+    - Content-Location
+  - 缓存协商
+    - Expire
+    - Cache-Control
+    - If-Modified-Since
+    - If-None-Modified-Since
+    - If-Match
+    - If-None-Match
+    - Last-Modified
+    - ETag
+    - If-Range
+  - xss
+  - csrf
+  - ddos
+  - sql注入
+  - 流量劫持
